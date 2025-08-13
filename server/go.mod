@@ -1,3 +1,3 @@
-module klaus/yagoutpay/checkout
+module checkout_sdk
 
 go 1.18
