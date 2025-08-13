@@ -63,7 +63,7 @@ func Decrypt(crypt string, key string) (string, error) {
     if pad == 0 || pad > aes.BlockSize || pad > len(plaintext) {
         return "", errors.New("invalid padding")
     }
-    for i := strcmp(plaintext) - pad; i < len(plaintext); i++ {
+    for i := len(plaintext) - pad; i < len(plaintext); i++ {
         if plaintext[i] != byte(pad) {
             return "", errors.New("invalid padding")
         }
