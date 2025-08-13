@@ -21,7 +21,8 @@ func Encrypt(base64Text string, base64Key string) (string, error) {
 	}
 
 	// Decode Base64 plaintext
-	plainBytes, err := base64.StdEncoding.DecodeString(base64Text)
+	// plainBytes, err := base64.StdEncoding.DecodeString(base64Text)
+    plainBytes := []byte(base64Text)
 	if err != nil {
 		return "", err
 	}

@@ -9,13 +9,19 @@ import (
     "checkout_sdk/models"
 )
 
-var (
-    merchantID    = os.Getenv("MERCHANT_ID")
-    encryptionKey = os.Getenv("ENCRYPTION_KEY")
-    postURL       = os.Getenv("POST_URL")
-)
+
+
+
 
 func PreparePayment(w http.ResponseWriter, r *http.Request) {
+    var (
+        merchantID    = os.Getenv("MERCHANT_ID")
+        encryptionKey = os.Getenv("ENCRYPTION_KEY")
+        postURL       = os.Getenv("POST_URL")
+    )
+
+    fmt.Printf("encryption key: %s ", encryptionKey)
+    fmt.Printf("merchantId %s \n", merchantID)
     var req models.PaymentRequest
     if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
         http.Error(w, "Invalid request", http.StatusBadRequest)
@@ -47,6 +53,10 @@ func PreparePayment(w http.ResponseWriter, r *http.Request) {
 
     allValues := txnDetails + "~" + pgDetails + "~" + cardDetails + "~" + custDetails + "~" + billDetails + "~" + shipDetails + "~" + itemDetails + "~" + upiDetails + "~" + otherDetails
 
+
+    fmt.Println("[DEBUG] allValues:", allValues)
+    fmt.Println("[DEBUG] encryptionKey length:", len(encryptionKey))
+
     merchantRequest, err := crypto.Encrypt(allValues, encryptionKey)
     if err != nil {
         http.Error(w, "Encryption error", http.StatusInternalServerError)
@@ -66,6 +76,9 @@ func PreparePayment(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleSuccess(w http.ResponseWriter, r *http.Request) {
+var (
+        encryptionKey = os.Getenv("ENCRYPTION_KEY")
+    )
     r.ParseForm()
     merchantResponse := r.FormValue("merchant_response")
     decrypted, err := crypto.Decrypt(merchantResponse, encryptionKey)
@@ -75,6 +88,7 @@ func HandleSuccess(w http.ResponseWriter, r *http.Request) {
     }
     fmt.Fprintf(w, "<h1>Payment Successful</h1><p>Details: %s</p>", decrypted)
 }
+
 
 func HandleFailure(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintln(w, "<h1>Payment Failed</h1>")
