@@ -7,97 +7,95 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"errors"
+	"fmt"
 )
 
-// Encrypt takes a Base64-encoded plaintext, AES-256-CBC encrypts it, and returns Base64 ciphertext.
-func Encrypt(base64Text string, base64Key string) (string, error) {
-	// Decode Base64 key
-	keyBytes, err := base64.StdEncoding.DecodeString(base64Key)
+func Encrypt(plainText string, base64Key string) (string, error) {
+	key, err := base64.StdEncoding.DecodeString(base64Key)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("key decoding failed: %w", err)
 	}
-	if len(keyBytes) != 32 {
-		return "", errors.New("invalid key length: must be 32 bytes after Base64 decoding")
+	if len(key) != 32 {
+		return "", errors.New("key must be 32 bytes after decoding")
 	}
 
-	// Decode Base64 plaintext
-	// plainBytes, err := base64.StdEncoding.DecodeString(base64Text)
-    plainBytes := []byte(base64Text)
+	iv := []byte("0123456789abcdef")
+	if len(iv) != aes.BlockSize {
+		return "", fmt.Errorf("IV must be %d bytes", aes.BlockSize)
+	}
+
+	plainBytes := []byte(plainText)
+	blockSize := aes.BlockSize
+	padLen := blockSize - (len(plainBytes) % blockSize)
+	padding := bytes.Repeat([]byte{byte(padLen)}, padLen)
+	paddedPlaintext := append(plainBytes, padding...)
+
+	block, err := aes.NewCipher(key)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("cipher creation failed: %w", err)
 	}
 
-	// Create cipher block
-	block, err := aes.NewCipher(keyBytes)
-	if err != nil {
-		return "", err
-	}
-
-	iv := []byte("0123456789abcdef") // Fixed IV for compatibility (not secure in production)
-
-	// PKCS#7 padding
-	blockSize := block.BlockSize()
-	pad := blockSize - (len(plainBytes) % blockSize)
-	padText := bytes.Repeat([]byte{byte(pad)}, pad)
-	plaintext := append(plainBytes, padText...)
-
-	// CBC mode encryption
+	ciphertext := make([]byte, len(paddedPlaintext))
 	mode := cipher.NewCBCEncrypter(block, iv)
-	ciphertext := make([]byte, len(plaintext))
-	mode.CryptBlocks(ciphertext, plaintext)
+	mode.CryptBlocks(ciphertext, paddedPlaintext)
 
 	return base64.StdEncoding.EncodeToString(ciphertext), nil
 }
 
-// Decrypt takes Base64 ciphertext, decrypts with AES-256-CBC, and returns Base64-encoded plaintext.
-func Decrypt(base64Crypt string, base64Key string) (string, error) {
-	// Decode Base64 key
-	keyBytes, err := base64.StdEncoding.DecodeString(base64Key)
+
+
+func GenerateHash(hashInput string, base64Key string) (string, error) {
+    if hashInput == "" {
+        return "", errors.New("hash input cannot be empty")
+    }
+
+    // Step 1: SHA-256 hash (use your hardcoded string for now)
+    h := sha256.New()
+    h.Write([]byte(hashInput))
+    shaHex := fmt.Sprintf("%x", h.Sum(nil)) // hex string
+
+    // Step 2: Encrypt the hex string
+    encrypted, err := Encrypt(shaHex, base64Key)
+    if err != nil {
+        return "", err
+    }
+
+    // Step 3: Return encrypted hash
+    return encrypted, nil
+}
+
+
+
+func Decrypt(base64Ciphertext string, base64Key string) (string, error) {
+	key, err := base64.StdEncoding.DecodeString(base64Key)
 	if err != nil {
-		return "", err
-	}
-	if len(keyBytes) != 32 {
-		return "", errors.New("invalid key length: must be 32 bytes after Base64 decoding")
+		return "", fmt.Errorf("key decoding failed: %w", err)
 	}
 
-	// Decode Base64 ciphertext
-	ciphertext, err := base64.StdEncoding.DecodeString(base64Crypt)
+	ciphertext, err := base64.StdEncoding.DecodeString(base64Ciphertext)
 	if err != nil {
-		return "", err
-	}
-
-	// Create cipher block
-	block, err := aes.NewCipher(keyBytes)
-	if err != nil {
-		return "", err
+		return "", fmt.Errorf("ciphertext decoding failed: %w", err)
 	}
 
 	iv := []byte("0123456789abcdef")
 
-	// CBC mode decryption
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return "", fmt.Errorf("cipher creation failed: %w", err)
+	}
+
+	if len(ciphertext)%aes.BlockSize != 0 {
+		return "", errors.New("ciphertext is not a multiple of block size")
+	}
+
 	mode := cipher.NewCBCDecrypter(block, iv)
 	plaintext := make([]byte, len(ciphertext))
 	mode.CryptBlocks(plaintext, ciphertext)
 
-	// Remove PKCS#7 padding
-	pad := int(plaintext[len(plaintext)-1])
-	if pad == 0 || pad > aes.BlockSize || pad > len(plaintext) {
+	padLen := int(plaintext[len(plaintext)-1])
+	if padLen > len(plaintext) {
 		return "", errors.New("invalid padding")
 	}
-	for i := len(plaintext) - pad; i < len(plaintext); i++ {
-		if plaintext[i] != byte(pad) {
-			return "", errors.New("invalid padding")
-		}
-	}
 
-	// Return plaintext as Base64 again
-	return base64.StdEncoding.EncodeToString(plaintext[:len(plaintext)-pad]), nil
+	return string(plaintext[:len(plaintext)-padLen]), nil
 }
-
-// GenerateHash creates a SHA256 hash of meID|merchantRequest and returns it in Base64.
-func GenerateHash(meID, merchantRequest string) string {
-	hash := sha256.New()
-	hash.Write([]byte(meID + "|" + merchantRequest))
-	return base64.StdEncoding.EncodeToString(hash.Sum(nil))
-}
-
