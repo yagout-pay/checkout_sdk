@@ -32,6 +32,8 @@ func corsMiddleware(next http.Handler) http.Handler {
 }
 
 func main() {
+	fs := http.FileServer(http.Dir("./static"))
+    http.Handle("/", fs)
 
 	if err := godotenv.Load(); err != nil {
 		fmt.Println("No .env file found")
