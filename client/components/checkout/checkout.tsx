@@ -35,7 +35,7 @@ export default function CheckoutPage() {
       type: "SET_PRICE_AND_ORDER",
       payload: { order_no: data?.id, amount: data?.productPrice },
     });
-  }, []);
+  }, [data?.id, data?.productPrice, dispatch]);
 
   const renderStep = () => {
     switch (step) {

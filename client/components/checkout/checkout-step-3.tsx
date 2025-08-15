@@ -29,9 +29,6 @@ const PaymentConfirmation = ({ productName }: PaymentDetailsFormProps) => {
         txn_type: "SALE",
       };
 
-      console.log("this is payment data", paymentData);
-
-      localStorage.setItem("paymentData", JSON.stringify(paymentData));
 
       const req = await processPayment(paymentData);
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // utils/paymentApi.ts
 import axios from "axios";
 

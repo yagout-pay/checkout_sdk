@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { createContext, useReducer, useEffect, ReactNode } from "react";
@@ -10,25 +11,25 @@ export interface PaymentData {
   mobile: string | null;
   success_url: string;
   failure_url: string;
+  done: boolean;
 }
 
 export type PaymentAction =
   | { type: "SET_PHONE"; payload: string }
   | { type: "RESET_PHONE" }
-  | {
-      type: "SET_PRICE_AND_ORDER";
-      payload: { amount: number; order_no: number };
-    }
-  | { type: "RESET_PAYMENT" };
+  | { type: "SET_PRICE_AND_ORDER"; payload: { amount: number; order_no: number } }
+  | { type: "RESET_PAYMENT" }
+  | { type: "PAY"; payload: boolean };
 
 const initialPayment: PaymentData = {
   order_no: null,
   amount: null,
-  cust_name: "John Doe",
-  email: "john@example.com",
+  cust_name: "Klaus Mikaelson",
+  email: "klaus@yahoo.com",
   mobile: null,
   success_url: "http://localhost:8080/success",
   failure_url: "http://localhost:8080/failure",
+  done: true,
 };
 
 const localStorageKey = "paymentData";
@@ -57,6 +58,8 @@ function reducer(state: PaymentData, action: PaymentAction): PaymentData {
       };
     case "RESET_PAYMENT":
       return initialPayment;
+    case "PAY":
+      return { ...state, done: action.payload };
     default:
       return state;
   }
@@ -85,3 +88,4 @@ export function PaymentProvider({ children }: { children: ReactNode }) {
     </PaymentContext.Provider>
   );
 }
+

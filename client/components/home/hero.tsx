@@ -15,7 +15,7 @@ const Hero = function () {
     dispatch({
       type: "RESET_PAYMENT",
     });
-  }, []);
+  }, [checkoutDispact, dispatch]);
   return (
     <section className="w-full h-[40%] min-h-[400px] sm:min-h-[300px] relative bg-gradient-to-br from-background via-primary/5 to-muted/30 overflow-hidden">
       {/* Dynamic grid overlay */}

@@ -1,3 +1,4 @@
+// eslint-disable
 "use client";
 
 import React, { useState, useContext } from "react";
@@ -22,7 +23,9 @@ const PaymentMethodSelection = () => {
       <div className="flex-1 space-y-8">
         <div className="text-center space-y-1">
           <h1 className="text-2xl font-bold">Select Payment Method</h1>
-          <p className="text-muted-foreground">Choose how you'd like to pay</p>
+          <p className="text-muted-foreground">
+            Choose how you&apos;d like to pay
+          </p>
         </div>
 
         {/* Payment Option */}
@@ -30,13 +33,20 @@ const PaymentMethodSelection = () => {
           <div
             onClick={() => setSelectedProvider("yagoutpay")}
             className={`p-6 rounded-lg border-2 transition-all cursor-pointer flex items-center gap-4
-              ${selectedProvider === "yagoutpay"
-                ? "border-primary bg-primary/5"
-                : "hover:border-muted-foreground/30"}
+              ${
+                selectedProvider === "yagoutpay"
+                  ? "border-primary bg-primary/5"
+                  : "hover:border-muted-foreground/30"
+              }
             `}
           >
-            <div className={`h-5 w-5 rounded-full border flex items-center justify-center
-              ${selectedProvider === "yagoutpay" ? "border-primary bg-primary" : "border-muted-foreground"}`}
+            <div
+              className={`h-5 w-5 rounded-full border flex items-center justify-center
+              ${
+                selectedProvider === "yagoutpay"
+                  ? "border-primary bg-primary"
+                  : "border-muted-foreground"
+              }`}
             >
               {selectedProvider === "yagoutpay" && (
                 <div className="h-2 w-2 rounded-full bg-white"></div>
@@ -44,7 +54,9 @@ const PaymentMethodSelection = () => {
             </div>
             <div className="flex-1">
               <h3 className="font-medium">YagoutPay</h3>
-              <p className="text-sm text-muted-foreground">Secure digital payments</p>
+              <p className="text-sm text-muted-foreground">
+                Secure digital payments
+              </p>
             </div>
           </div>
         </div>
