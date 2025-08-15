@@ -1,4 +1,4 @@
-"use client";
+export const dynamic = "force-dynamic";
 
 import CheckoutPage from "@/components/checkout/checkout";
 import Header from "@/components/home/header";
