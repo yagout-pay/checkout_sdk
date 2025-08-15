@@ -49,18 +49,18 @@ func GenerateHash(hashInput string, base64Key string) (string, error) {
         return "", errors.New("hash input cannot be empty")
     }
 
-    // Step 1: SHA-256 hash (use your hardcoded string for now)
+    // hash using sha256 algorithm
     h := sha256.New()
     h.Write([]byte(hashInput))
     shaHex := fmt.Sprintf("%x", h.Sum(nil)) // hex string
 
-    // Step 2: Encrypt the hex string
+    // Encrypt the hex string
     encrypted, err := Encrypt(shaHex, base64Key)
     if err != nil {
         return "", err
     }
 
-    // Step 3: Return encrypted hash
+    // Return encrypted hash
     return encrypted, nil
 }
 

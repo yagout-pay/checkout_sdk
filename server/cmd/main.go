@@ -18,7 +18,7 @@ func helloWorld(w http.ResponseWriter, r *http.Request) {
 
 func corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "https://d22e169bb385.ngrok-free.app")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
@@ -42,8 +42,6 @@ func main() {
 
 	mux.HandleFunc("/", helloWorld)
 	mux.HandleFunc("/api/prepare-payment", handlers.PreparePayment)
-	// mux.HandleFunc("/success", handlers.HandleSuccess)
-	// mux.HandleFunc("/failure", handlers.HandleFailure)
 
     fmt.Println("Backend running on http://localhost:3000")
 	http.ListenAndServe(":3000", corsMiddleware(mux))

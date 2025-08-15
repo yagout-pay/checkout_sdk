@@ -1,0 +1,32 @@
+
+# Ignore git history
+.git
+.gitignore
+
+# Ignore environment files
+.env
+.env.example
+
+# Ignore local dependencies & build outputs
+node_modules
+vendor
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Ignore temporary files
+*.log
+*.tmp
+
+# Ignore Docker-related
+Dockerfile
+docker-compose*
+
+# Ignore IDE/editor configs
+.vscode
+.idea
+*.swp

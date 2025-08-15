@@ -27,9 +27,6 @@ func PreparePayment(w http.ResponseWriter, r *http.Request) {
 
 	amount := req.Amount
 
-
-
-
 	txnString := fmt.Sprintf(
     "yagout|%s|%.0f|%.2f|ETH|ETB|SALE|%s|%s|WEB~|||~|||~%s|%s|%s|0|Y~||||~||||||~||~~||||",
     merchantID,
@@ -64,21 +61,6 @@ func PreparePayment(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("encryption failed: %v", err), http.StatusInternalServerError)
 		return
 	}
-
-	encryptedHash, err1 := crypto.Encrypt(hash, encryptionKey)
-	if err1 != nil {
-		http.Error(w, fmt.Sprintf("hash encryption failed: %v", err), http.StatusInternalServerError)
-		return
-	}
-	fmt.Printf("Encrypted Hash: %s\n", encryptedHash);
-	fmt.Printf("Normal Hash: %s\n", hash);
-
-	decryptedHash, err := crypto.Decrypt(encryptedHash, encryptionKey)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("decryption failed: %v", err), http.StatusInternalServerError)
-		return
-	}
-	fmt.Printf("Decrypted Hash: %s\n", decryptedHash);
 
 
 	response := map[string]string{
